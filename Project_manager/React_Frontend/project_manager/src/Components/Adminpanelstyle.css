@@ -1,0 +1,34 @@
+.admin-panel-container {
+  display: flex;
+  height: 100vh;
+  font-family: sans-serif;
+}
+
+.sidebar {
+  width: 200px;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-item {
+  /* padding: 15px 20px; */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sidebar-item:hover {
+  background-color: #62616197;
+}
+
+.sidebar-item.active {
+  background-color: #fefefe;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+.content-area {
+  flex-grow: 1;
+  padding: 30px;
+  background-color: #fff;
+}

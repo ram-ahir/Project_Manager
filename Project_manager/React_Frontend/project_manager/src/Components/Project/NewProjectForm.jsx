@@ -44,7 +44,7 @@ const NewProjectForm = ({ onSubmit, initialData = null }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className=" p-4 mb-3">
+    <form onSubmit={handleSubmit} className="p-4 mb-3">
       <h5 className="mb-3">{initialData ? "Edit Project" : "New Project"}</h5>
 
       <input

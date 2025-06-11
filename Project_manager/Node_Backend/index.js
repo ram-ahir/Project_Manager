@@ -64,6 +64,56 @@ app.put('/api/project/:id', async (req, res) => {
   res.json(result.rows[0]);
 });
 
+// ###########################################################################  Tables
+
+// GET /api/tables?project_id=1
+app.get('/api/tables', async (req, res) => {
+  const { project_id } = req.query;
+
+  if (!project_id) {
+    return res.status(400).json({ error: 'Missing project_id' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM all_table WHERE project_id = $1`,
+      [project_id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching tables:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST - Create new table
+app.post('/api/tables', async (req, res) => {
+  const { project_id, table_name, table_description } = req.body;
+  const result = await pool.query(
+    `INSERT INTO all_table (project_id, table_name, table_description)
+     VALUES ($1, $2, $3) RETURNING *`,
+    [project_id, table_name, table_description]
+  );
+  res.status(201).json(result.rows[0]);
+});
+
+// PUT - Update table
+app.put('/api/tables/:id', async (req, res) => {
+  const { table_name, table_description } = req.body;
+  const { id } = req.params;
+  const result = await pool.query(
+    `UPDATE all_table SET table_name=$1, table_description=$2 WHERE table_id=$3 RETURNING *`,
+    [table_name, table_description, id]
+  );
+  res.json(result.rows[0]);
+});
+
+// DELETE - Delete table
+app.delete('/api/tables/:id', async (req, res) => {
+  const { id } = req.params;
+  await pool.query(`DELETE FROM all_table WHERE table_id = $1`, [id]);
+  res.status(204).send();
+});
 
 
 

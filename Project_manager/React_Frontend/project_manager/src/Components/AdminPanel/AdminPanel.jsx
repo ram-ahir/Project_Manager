@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import NewProjectForm from './NewProjectForm';
 import Leftbar from './Leftbar';
 import axios from 'axios';
+import Tables from '../Table/Tables';
 
 const AdminPanel = () => {
     const [activeItem, setActiveItem] = useState("Project");
@@ -42,10 +43,11 @@ const AdminPanel = () => {
                         )}
                     </div>
                 )
-            case "Products":
-                return <div><h3>Products Section</h3><p>Manage your products here...</p></div>;
+            
             case "Tables":
-                return <div><h3>Tables Section</h3><p>Configure your database tables...</p></div>;
+                return (
+                    <Tables project={selectedProject}/>
+                )
             case "Forms":
                 return <div><h3>Forms Section</h3><p>Design and manage forms...</p></div>;
             case "Users":
@@ -70,11 +72,12 @@ const AdminPanel = () => {
                             setFormMode("add");
                             setSelectedProject(null);
                         }}
+                        setSelectedProject={setSelectedProject}
                     />
                 </div>
 
                 {/* Content Area */}
-                <div className="col-md-8 p-4">
+                <div className="col-md-8 p-3">
                     {renderContent()}
                 </div>
             </div>

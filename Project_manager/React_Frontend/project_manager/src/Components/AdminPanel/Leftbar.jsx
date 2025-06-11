@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Leftbar = ({ setActiveItem, onEditProject, onAddNewProject }) => {
+const Leftbar = ({ setActiveItem, onEditProject, onAddNewProject, setSelectedProject }) => {
 
     const [projects, setProjects] = useState([]);
     const [project, setProject] = useState(null);
@@ -16,6 +16,7 @@ const Leftbar = ({ setActiveItem, onEditProject, onAddNewProject }) => {
         const selectedId = parseInt(e.target.value);
         const selectedProject = projects.find(p => p.project_id === selectedId);
         setProject(selectedProject);
+        setSelectedProject(selectedProject)
         console.log('Selected project:', selectedProject);
     };
 
@@ -35,11 +36,11 @@ const Leftbar = ({ setActiveItem, onEditProject, onAddNewProject }) => {
                     <h2 className="accordion-header" id="headingBudget">
                         <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBudget"
                             style={{ backgroundColor: 'white', color: 'black', boxShadow: 'none', border: 'none' }}>
-                            Project
+                            Project : {project?.project_name || 'No project selected'}
                         </button>
                     </h2>
                     <div id="collapseBudget" className="accordion-collapse collapse " data-bs-parent="#budgetAccordion">
-                        <div className="accordion-body">
+                        <div className="accordion-body" onClick={()=>setActiveItem('Project')}>
                             <select className="form-select" aria-label="Project select" onChange={handleProjectChange}>
                                 <option value="">Select your Project</option>
                                 {projects.map((proj) => (
@@ -77,6 +78,14 @@ const Leftbar = ({ setActiveItem, onEditProject, onAddNewProject }) => {
 
                 <hr className='m-0 mx-4' />
                 {/* Posted by */}
+                <div className='p-1 ps-4 py-2' onClick={()=>setActiveItem('Tables')}>
+                    <p className="m-0" >
+                        Tables for {project?.project_name || 'No project selected'}
+                    </p>
+                </div>
+                <hr className='m-0 mx-4' />
+
+                {/* tables */}
                 <div className="accordion-item border-0">
                     <h2 className="accordion-header" id="headingPostedBy">
                         <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePostedBy"
@@ -88,6 +97,8 @@ const Leftbar = ({ setActiveItem, onEditProject, onAddNewProject }) => {
                         <div className="accordion-body d-flex flex-wrap gap-2"></div>
                     </div>
                 </div>
+
+
 
                 <hr className='m-0 mx-4' />
                 {/* Purpose */}

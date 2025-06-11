@@ -11,7 +11,7 @@ CREATE TABLE project_table (
     project_name VARCHAR(255) NOT NULL,
     project_description TEXT,
     database_id INTEGER NOT NULL,
-    datapath_path TEXT,
+    database_path TEXT,
 
     CONSTRAINT fk_database
       FOREIGN KEY (database_id)
@@ -26,10 +26,57 @@ VALUES
   ('mongoDB');
 
 
-INSERT INTO project_table (project_name, project_description, database_id, datapath_path)
+-- Sample Projects (Assume database_id = 1 for all)
+INSERT INTO project_table (project_name, project_description, database_id, database_path)
 VALUES 
-  ('Inventory System', 'Manages product stock levels and supplier info', 1, '/data/inventory'),
-  ('HR Portal', 'Handles employee records and payroll system', 2, '/data/hr'),
-  ('Analytics Dashboard', 'Provides insights and data visualizations', 3, '/data/analytics'),
-  ('Client CRM', 'Tracks client interactions and sales pipeline', 1, '/data/crm');
+  ('CRM System', 'Customer relationship management platform', 1, '/crm'),
+  ('Inventory Manager', 'Tool to track stock and supply', 1, '/inventory'),
+  ('Learning Portal', 'Online education management', 1, '/lms');
 
+
+CREATE TABLE all_table (
+  table_id SERIAL PRIMARY KEY,
+  project_id INTEGER NOT NULL,
+  table_name VARCHAR(255) NOT NULL,
+  table_description TEXT,
+  is_generated BOOLEAN DEFAULT false,
+  generated_date TIMESTAMP,
+  FOREIGN KEY (project_id) REFERENCES project_table(project_id) ON DELETE CASCADE
+);
+
+-- Sample Tables for CRM System (project_id = 1)
+INSERT INTO all_table (project_id, table_name, table_description, is_generated, generated_date)
+VALUES
+  (1, 'customers', 'Stores customer details', false, NULL),
+  (1, 'leads', 'Tracks marketing leads', false, NULL),
+  (1, 'interactions', 'Customer interactions log', false, NULL);
+
+-- Sample Tables for Inventory Manager (project_id = 2)
+INSERT INTO all_table (project_id, table_name, table_description, is_generated, generated_date)
+VALUES
+  (2, 'products', 'Product catalog', false, NULL),
+  (2, 'suppliers', 'Supplier contact details', false, NULL),
+  (2, 'stock_entries', 'Stock change history', false, NULL);
+
+-- Sample Tables for Learning Portal (project_id = 3)
+INSERT INTO all_table (project_id, table_name, table_description, is_generated, generated_date)
+VALUES
+  (3, 'students', 'Student enrollment data', false, NULL),
+  (3, 'courses', 'Course listings and details', false, NULL),
+  (3, 'assignments', 'Submitted assignments', false, NULL);
+
+
+CREATE TABLE field_datatype (
+  field_datatype_id SERIAL PRIMARY KEY,
+  field_datatype_name VARCHAR(255) NOT NULL
+);
+
+
+INSERT INTO all_table (project_id, table_name, table_description) VALUES
+('Text'),
+('NUMERIC (15, 2)'),
+('boolean'),
+('date'),
+('time'),
+('Image'),
+('bytea	');
