@@ -13,19 +13,21 @@ app.get('/', (req, res) => {
   res.send('Welcome to my server!');
 });
 
-app.get('/api/project', async (req, res) => {
+app.get('/api/database', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM project_table ORDER BY project_id');
+    const result = await pool.query('SELECT * FROM database_table ORDER BY database_id');
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching projects:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+// ###########################################################################  projects
 
-app.get('/api/database', async (req, res) => {
+// GET projects
+app.get('/api/project', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM database_table ORDER BY database_id');
+    const result = await pool.query('SELECT * FROM project_table ORDER BY project_id');
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching projects:', error);
@@ -37,18 +39,18 @@ app.get('/api/database', async (req, res) => {
 
 // POST - Add new project
 app.post('/api/project', async (req, res) => {
-  const { project_name, project_description, database_id, database_path } = req.body;
+  const { project_name, project_description, database_id, database_path, project_path } = req.body;
   const result = await pool.query(
-    `INSERT INTO project_table (project_name, project_description, database_id, database_path)
-     VALUES ($1, $2,$3 ,$4) RETURNING *`,
-    [project_name, project_description, database_id, database_path]
+    `INSERT INTO project_table (project_name, project_description, database_id, database_path, project_path)
+     VALUES ($1, $2,$3 ,$4, $5) RETURNING *`,
+    [project_name, project_description, database_id, database_path, project_path ]
   );
   res.status(201).json(result.rows[0]);
 });
 
 // PUT - Update existing project
 app.put('/api/project/:id', async (req, res) => {
-  const { project_name, project_description, database_id, database_path } = req.body;
+  const { project_name, project_description, database_id, database_path, project_path } = req.body;
   const { id } = req.params;
 
   const result = await pool.query(
@@ -56,12 +58,20 @@ app.put('/api/project/:id', async (req, res) => {
      SET project_name = $1, 
          project_description = $2, 
          database_id =  $3,
-         database_path = $4
-     WHERE project_id = $5 
+         database_path = $4,
+         project_path = $5
+     WHERE project_id = $6
      RETURNING *`,
-    [project_name, project_description, database_id, database_path, id]
+    [project_name, project_description, database_id, database_path, project_path, id]
   );
   res.json(result.rows[0]);
+});
+
+// DELETE - Delete project
+app.delete('/api/project/:id', async (req, res) => {
+  const { id } = req.params;
+  await pool.query(`DELETE FROM project_table WHERE project_id = $1`, [id]);
+  res.status(204).send();
 });
 
 // ###########################################################################  Tables
@@ -69,11 +79,7 @@ app.put('/api/project/:id', async (req, res) => {
 // GET /api/tables?project_id=1
 app.get('/api/tables', async (req, res) => {
   const { project_id } = req.query;
-
-  if (!project_id) {
-    return res.status(400).json({ error: 'Missing project_id' });
-  }
-
+  if (!project_id) return res.status(400).json({ error: 'Missing project_id' });
   try {
     const result = await pool.query(
       `SELECT * FROM all_table WHERE project_id = $1`,
@@ -88,25 +94,49 @@ app.get('/api/tables', async (req, res) => {
 
 // POST - Create new table
 app.post('/api/tables', async (req, res) => {
-  const { project_id, table_name, table_description } = req.body;
-  const result = await pool.query(
-    `INSERT INTO all_table (project_id, table_name, table_description)
-     VALUES ($1, $2, $3) RETURNING *`,
-    [project_id, table_name, table_description]
-  );
-  res.status(201).json(result.rows[0]);
+  let { project_id, table_name, table_description, is_generated = false, generated_date } = req.body;
+
+  // Convert empty string to null for PostgreSQL timestamp
+  if (generated_date === '') generated_date = null;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO all_table (project_id, table_name, table_description, is_generated, generated_date)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [project_id, table_name, table_description, is_generated, generated_date]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error inserting table:', err);
+    res.status(500).json({ error: 'Failed to create table' });
+  }
 });
 
 // PUT - Update table
 app.put('/api/tables/:id', async (req, res) => {
-  const { table_name, table_description } = req.body;
+  let { table_name, table_description, is_generated, generated_date } = req.body;
   const { id } = req.params;
-  const result = await pool.query(
-    `UPDATE all_table SET table_name=$1, table_description=$2 WHERE table_id=$3 RETURNING *`,
-    [table_name, table_description, id]
-  );
-  res.json(result.rows[0]);
+
+  if (generated_date === '') generated_date = null;
+
+  try {
+    const result = await pool.query(
+      `UPDATE all_table
+         SET table_name = $1,
+             table_description = $2,
+             is_generated = $3,
+             generated_date = $4
+       WHERE table_id = $5
+       RETURNING *`,
+      [table_name, table_description, is_generated, generated_date, id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating table:', err);
+    res.status(500).json({ error: 'Failed to update table' });
+  }
 });
+
 
 // DELETE - Delete table
 app.delete('/api/tables/:id', async (req, res) => {
@@ -115,6 +145,160 @@ app.delete('/api/tables/:id', async (req, res) => {
   res.status(204).send();
 });
 
+// ###########################################################################  Tables Wise Field
+// GET table name for a given table_id
+app.get('/api/gettablename', async (req, res) => {
+  const { table_id } = req.query;
+  if (!table_id) return res.status(400).json({ error: 'Missing table_id' });
+
+  try {
+    const result = await pool.query(
+      `SELECT table_name FROM all_table WHERE table_id = $1 `,
+      [table_id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error fetching Table Name:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// GET all fields for a given table
+app.get('/api/fields', async (req, res) => {
+  const { table_id } = req.query;
+  if (!table_id) return res.status(400).json({ error: 'Missing table_id' });
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM table_wise_field WHERE table_id = $1 ORDER BY table_wise_field_id`,
+      [table_id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching fields:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST - Create new field
+app.post('/api/fields', async (req, res) => {
+  let {
+    table_id,
+    field_name,
+    field_datatype_id,
+    is_primary = false,
+    field_label,
+    is_auto_increment = false,
+    is_foreign_key = false,
+    reference_table_id,
+    reference_table_field_id
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO table_wise_field 
+        (table_id, field_name, field_datatype_id, is_primary, field_label, is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       RETURNING *`,
+      [
+        table_id,
+        field_name,
+        field_datatype_id,
+        is_primary,
+        field_label || null,
+        is_auto_increment,
+        is_foreign_key,
+        reference_table_id || null,
+        reference_table_field_id || null
+      ]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error inserting field:', err);
+    res.status(500).json({ error: 'Failed to insert field' });
+  }
+});
+
+// PUT - Update a field
+app.put('/api/fields/:id', async (req, res) => {
+  const { id } = req.params;
+  let {
+    table_id,
+    field_name,
+    field_datatype_id,
+    is_primary = false,
+    field_label,
+    is_auto_increment = false,
+    is_foreign_key = false,
+    reference_table_id,
+    reference_table_field_id
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE table_wise_field SET
+        table_id = $1,
+        field_name = $2,
+        field_datatype_id = $3,
+        is_primary = $4,
+        field_label = $5,
+        is_auto_increment = $6,
+        is_foreign_key = $7,
+        reference_table_id = $8,
+        reference_table_field_id = $9
+       WHERE table_wise_field_id = $10
+       RETURNING *`,
+      [
+        table_id,
+        field_name,
+        field_datatype_id,
+        is_primary,
+        field_label || null,
+        is_auto_increment,
+        is_foreign_key,
+        reference_table_id || null,
+        reference_table_field_id || null,
+        id
+      ]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating field:', err);
+    res.status(500).json({ error: 'Failed to update field' });
+  }
+});
+
+// DELETE - Delete a field
+app.delete('/api/fields/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await pool.query(
+      `DELETE FROM table_wise_field WHERE table_wise_field_id = $1`,
+      [id]
+    );
+    res.status(204).send();
+  } catch (err) {
+    console.error('Error deleting field:', err);
+    res.status(500).json({ error: 'Failed to delete field' });
+  }
+});
+
+// datatype by database id
+app.get('/api/datatype', async (req, res) => {
+  const { database_id } = req.query;
+  if (!database_id) return res.status(400).json({ error: 'Missing database_id' });
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM field_datatype WHERE database_table_id = $1`,
+      [database_id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching datatypes:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 

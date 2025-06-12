@@ -1,7 +1,8 @@
 .admin-panel-container {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 56px);
   font-family: sans-serif;
+  overflow: hidden; /* prevent page scroll */
 }
 
 .sidebar {
@@ -27,8 +28,15 @@
   font-weight: bold;
 }
 
-.content-area {
+/* .content-area {
   flex-grow: 1;
   padding: 30px;
   background-color: #fff;
+} */
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding: 30px;
+  background-color: #f8f9fa;
 }

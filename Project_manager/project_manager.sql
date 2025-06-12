@@ -12,6 +12,7 @@ CREATE TABLE project_table (
     project_description TEXT,
     database_id INTEGER NOT NULL,
     database_path TEXT,
+    project_path TEXT,
 
     CONSTRAINT fk_database
       FOREIGN KEY (database_id)
@@ -27,11 +28,11 @@ VALUES
 
 
 -- Sample Projects (Assume database_id = 1 for all)
-INSERT INTO project_table (project_name, project_description, database_id, database_path)
+INSERT INTO project_table (project_name, project_description, project_path, database_id, database_path)
 VALUES 
-  ('CRM System', 'Customer relationship management platform', 1, '/crm'),
-  ('Inventory Manager', 'Tool to track stock and supply', 1, '/inventory'),
-  ('Learning Portal', 'Online education management', 1, '/lms');
+  ('CRM System', 'Customer relationship management platform', '/crm', 1, '/crm'),
+  ('Inventory Manager', 'Tool to track stock and supply', '/crm', 1, '/inventory'),
+  ('Learning Portal', 'Online education management', '/crm', 1, '/lms');
 
 
 CREATE TABLE all_table (
@@ -68,15 +69,68 @@ VALUES
 
 CREATE TABLE field_datatype (
   field_datatype_id SERIAL PRIMARY KEY,
-  field_datatype_name VARCHAR(255) NOT NULL
+  datatype_name VARCHAR(100) NOT NULL,
+  database_table_id INTEGER NOT NULL,
+  
+  CONSTRAINT fk_database_table
+    FOREIGN KEY (database_table_id)
+    REFERENCES database_table(database_id)
+    ON DELETE CASCADE
 );
 
 
-INSERT INTO all_table (project_id, table_name, table_description) VALUES
-('Text'),
-('NUMERIC (15, 2)'),
-('boolean'),
-('date'),
-('time'),
-('Image'),
-('bytea	');
+
+INSERT INTO field_datatype (field_datatype_name, database_table_id) VALUES
+('Text',2),
+('NUMERIC (15, 2)',2),
+('boolean',2),
+('date',2),
+('time',2),
+('Image',2),
+('bytea	',2);
+
+
+CREATE TABLE table_wise_field (
+  table_wise_field_id SERIAL PRIMARY KEY,
+  table_id INTEGER NOT NULL,
+  field_name VARCHAR(255) NOT NULL,
+  field_datatype_id INTEGER NOT NULL,
+  is_primary BOOLEAN DEFAULT false,
+  field_label VARCHAR(255),
+  is_auto_increment BOOLEAN DEFAULT false,
+  is_foreign_key BOOLEAN DEFAULT false,
+  reference_table_id INTEGER,
+  reference_table_field_id INTEGER,
+
+  -- Foreign Keys
+  CONSTRAINT fk_table FOREIGN KEY (table_id)
+    REFERENCES all_table(table_id) ON DELETE CASCADE,
+
+  CONSTRAINT fk_datatype FOREIGN KEY (field_datatype_id)
+    REFERENCES field_datatype(field_datatype_id) ON DELETE RESTRICT,
+
+  CONSTRAINT fk_reference_table FOREIGN KEY (reference_table_id)
+    REFERENCES all_table(table_id) ON DELETE SET NULL,
+
+  CONSTRAINT fk_reference_field FOREIGN KEY (reference_table_field_id)
+    REFERENCES table_wise_field(table_wise_field_id) ON DELETE SET NULL
+);
+
+
+-- Fields for table_id = 5
+INSERT INTO table_wise_field (table_id, field_name, field_datatype_id, is_primary, field_label, is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id)
+VALUES
+(5, 'id', 1, true, 'ID', true, false, NULL, NULL),
+(5, 'name', 2, false, 'Name', false, false, NULL, NULL),
+(5, 'email', 2, false, 'Email', false, false, NULL, NULL),
+(5, 'user_type_id', 3, false, 'User Type', false, true, 9, NULL),
+(5, 'created_at', 4, false, 'Created At', false, false, NULL, NULL);
+
+-- Fields for table_id = 9
+INSERT INTO table_wise_field (table_id, field_name, field_datatype_id, is_primary, field_label, is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id)
+VALUES
+(9, 'user_type_id', 1, true, 'User Type ID', true, false, NULL, NULL),
+(9, 'type_name', 2, false, 'Type Name', false, false, NULL, NULL),
+(9, 'is_active', 5, false, 'Is Active', false, false, NULL, NULL),
+(9, 'created_by', 3, false, 'Created By', false, true, 5, 1), -- references table 5, field 1 (id)
+(9, 'created_at', 4, false, 'Created At', false, false, NULL, NULL);
