@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Button, Form } from 'react-bootstrap';
+import { GridHeaderstyles,SelectedGridStyle } from '../../Style/GridStyle';
+
 
 const Project = ({ setcurrentProject }) => {
     const [projects, setProjects] = useState([]);
@@ -114,7 +116,7 @@ const Project = ({ setcurrentProject }) => {
 
             <Button
                 variant="primary"
-                className="mb-3"
+                className="mb-3 float-end rounded-pill"
                 onClick={() => {
                     resetForm();
                     setShowForm(true);
@@ -122,18 +124,19 @@ const Project = ({ setcurrentProject }) => {
             >
                 Add New Project
             </Button>
-            <div className="shadow rounded">
-                <Table hover >
+            <div >
+                <Table hover className="shadow rounded">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Database</th>
-                            <th>Database Path</th>
-                            <th>Project Path</th>
-                            <th>Actions</th>
+                            <th style={GridHeaderstyles}>Name</th>
+                            <th style={GridHeaderstyles}>Description</th>
+                            <th style={GridHeaderstyles}>Database</th>
+                            <th style={GridHeaderstyles}>Database Path</th>
+                            <th style={GridHeaderstyles}>Project Path</th>
+                            <th style={GridHeaderstyles}>Actions</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {projects.map(proj => (
                             <tr
@@ -144,16 +147,16 @@ const Project = ({ setcurrentProject }) => {
                                     setcurrentProject(proj);
                                     setSelectedProjectName(proj.project_name)
                                 }}
-                                style={{ cursor: 'pointer' }}
+                                style={{ cursor: 'pointer'}}
                             >
                                 <td>{proj.project_name}</td>
                                 <td>{proj.project_description}</td>
                                 <td>{getDatabaseName(proj.database_id)}</td>
                                 <td>{proj.database_path}</td>
                                 <td>{proj.project_path}</td>
-                                <td className="d-flex gap-2">
-                                    <Button size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(proj); }}>Edit</Button>
-                                    <Button size="sm" variant="danger" onClick={(e) => { e.stopPropagation(); handleDelete(proj.project_id); }}>Delete</Button>
+                                <td className="">
+                                    <i class="fa-solid fa-pen-to-square fa-lg btn" onClick={(e) => { e.stopPropagation(); handleEdit(proj); }}></i>
+                                    <i class="fa-solid fa-trash fa-lg btn" onClick={(e) => { e.stopPropagation(); handleDelete(proj.project_id); }}></i>
                                 </td>
                             </tr>
                         ))}

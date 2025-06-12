@@ -3,9 +3,9 @@ import './Adminpanelstyle.css'; // Import styles for sidebar and active/hover ef
 import Project from './Project/Project';
 import Tables from './Table/Tables';
 
-const Adminpanel = () => {
+const Adminpanel = ({currentProject, setcurrentProject}) => {
 
-  const [currentProject, setcurrentProject] = useState(null);
+  // const [currentProject, setcurrentProject] = useState(null);
     
   const [activeItem, setActiveItem] = useState('Project');
 
@@ -31,7 +31,7 @@ const Adminpanel = () => {
   return (
     <div className="admin-panel-container">
       <div className="sidebar p-2 gap-2 bg-dark text-white">
-        <p className='text-center m-0' style={{color:"yellow", fontSize:"13px"}} >{currentProject?.project_name || 'No project selected'}</p>
+        {/* <p className='text-center m-0' style={{color:"yellow", fontSize:"13px"}} >{currentProject?.project_name || 'No project selected'}</p> */}
         {navItems.map(item => (
           <div
             key={item}

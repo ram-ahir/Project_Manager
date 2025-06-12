@@ -7,12 +7,13 @@ import Navbar from './Components/Navbar'
 import Adminpanel from './Components/Adminpanel'
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [currentProject, setcurrentProject] = useState(null);
 
   return (
     <>
-      <Navbar/>
-      <Adminpanel/>
+      <Navbar currentProject={currentProject}/>
+      <Adminpanel currentProject={currentProject} setcurrentProject={setcurrentProject}/>
     </>
   )
 }

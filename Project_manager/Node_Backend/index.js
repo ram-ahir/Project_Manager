@@ -187,6 +187,7 @@ app.post('/api/fields', async (req, res) => {
     field_datatype_id,
     is_primary = false,
     field_label,
+    display_name,
     is_auto_increment = false,
     is_foreign_key = false,
     reference_table_id,
@@ -196,8 +197,8 @@ app.post('/api/fields', async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO table_wise_field 
-        (table_id, field_name, field_datatype_id, is_primary, field_label, is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+        (table_id, field_name, field_datatype_id, is_primary, field_label, display_name, is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
        RETURNING *`,
       [
         table_id,
@@ -205,6 +206,7 @@ app.post('/api/fields', async (req, res) => {
         field_datatype_id,
         is_primary,
         field_label || null,
+        display_name || null,
         is_auto_increment,
         is_foreign_key,
         reference_table_id || null,
@@ -227,6 +229,7 @@ app.put('/api/fields/:id', async (req, res) => {
     field_datatype_id,
     is_primary = false,
     field_label,
+    display_name,
     is_auto_increment = false,
     is_foreign_key = false,
     reference_table_id,
@@ -241,11 +244,12 @@ app.put('/api/fields/:id', async (req, res) => {
         field_datatype_id = $3,
         is_primary = $4,
         field_label = $5,
-        is_auto_increment = $6,
-        is_foreign_key = $7,
-        reference_table_id = $8,
-        reference_table_field_id = $9
-       WHERE table_wise_field_id = $10
+        display_name = $6,
+        is_auto_increment = $7,
+        is_foreign_key = $8,
+        reference_table_id = $9,
+        reference_table_field_id = $10
+       WHERE table_wise_field_id = $11
        RETURNING *`,
       [
         table_id,
@@ -253,6 +257,7 @@ app.put('/api/fields/:id', async (req, res) => {
         field_datatype_id,
         is_primary,
         field_label || null,
+        display_name || null,
         is_auto_increment,
         is_foreign_key,
         reference_table_id || null,

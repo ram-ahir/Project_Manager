@@ -126,16 +126,16 @@ const Tables = ({ project, onSelectTable }) => {
 
       <Button
         variant="primary"
-        className="mb-3 float-end"
+        className="mb-3 float-end rounded-pill"
         onClick={() => {
           resetForm();
           setShowForm(true);
         }}
       >
-        Add New Table
+        Add Table
       </Button>
-      <div className="shadow rounded">
-        <Table hover>
+      <div className="">
+        <Table hover className='shadow rounded'>
           <thead>
             <tr>
               <th>Name</th>
@@ -161,26 +161,20 @@ const Tables = ({ project, onSelectTable }) => {
                     ? new Date(tbl.generated_date).toLocaleString()
                     : '-'}
                 </td>
-                <td className="d-flex gap-2">
-                  <Button
-                    size="sm"
+                <td className="">
+                  <i class="fa-solid fa-pen-to-square fa-lg btn"
                     onClick={(e) => {
                       e.stopPropagation(); // prevent row click
                       handleEdit(tbl);
                     }}
                   >
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="danger"
+                  </i>
+                  <i class="fa-solid fa-trash fa-lg btn"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(tbl.table_id);
                     }}
-                  >
-                    Delete
-                  </Button>
+                  ></i>
                 </td>
               </tr>
             ))}
@@ -212,26 +206,31 @@ const Tables = ({ project, onSelectTable }) => {
               />
             </Form.Group>
 
-            <Form.Group className="mb-2" controlId="isGenerated">
-              <Form.Check
-                type="checkbox"
-                label="Is Generated"
-                name="is_generated"
-                checked={formData.is_generated}
-                onChange={handleChange}
-              />
-            </Form.Group>
+            {editing && (
+              <>
+                <Form.Group className="mb-2" controlId="isGenerated">
+                  <Form.Check
+                    type="checkbox"
+                    label="Is Generated"
+                    name="is_generated"
+                    checked={formData.is_generated}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Generated Date</Form.Label>
-              <Form.Control
-                type="datetime-local"
-                name="generated_date"
-                value={formData.generated_date}
-                onChange={handleChange}
-                disabled={!formData.is_generated}
-              />
-            </Form.Group>
+                <Form.Group className="mb-2">
+                  <Form.Label>Generated Date</Form.Label>
+                  <Form.Control
+                    type="datetime-local"
+                    name="generated_date"
+                    value={formData.generated_date}
+                    onChange={handleChange}
+                    disabled={!formData.is_generated}
+                  />
+                </Form.Group>
+              </>
+            )}
+
 
             <div className="d-flex gap-2">
               <Button type="submit">
@@ -247,8 +246,8 @@ const Tables = ({ project, onSelectTable }) => {
 
       {selectedTableId && (
         <>
-        <hr />
-        <TableField tableId={selectedTableId} project={project} />
+          <hr />
+          <TableField tableId={selectedTableId} project={project} />
         </>
       )}
 

@@ -9,9 +9,10 @@ const TableField = ({ tableId, project }) => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     field_name: '',
+    field_label: '',
+    display_name: '',
     field_datatype_id: '',
     is_primary: false,
-    field_label: '',
     is_auto_increment: false,
     is_foreign_key: false,
     reference_table_id: '',
@@ -44,6 +45,7 @@ const TableField = ({ tableId, project }) => {
     const res = await axios.get(`http://localhost:3000/api/gettablename?table_id=${tableId}`);
     setTablename(res.data);
   };
+
   const fetchFields = async () => {
     const res = await axios.get(`http://localhost:3000/api/fields?table_id=${tableId}`);
     setFields(res.data);
@@ -99,9 +101,10 @@ const TableField = ({ tableId, project }) => {
     setEditingFieldId(field.table_wise_field_id);
     setFormData({
       field_name: field.field_name,
+      field_label: field.field_label || '',
+      display_name: field.display_name || '',
       field_datatype_id: field.field_datatype_id,
       is_primary: field.is_primary,
-      field_label: field.field_label || '',
       is_auto_increment: field.is_auto_increment,
       is_foreign_key: field.is_foreign_key,
       reference_table_id: field.reference_table_id || '',
@@ -127,9 +130,10 @@ const TableField = ({ tableId, project }) => {
     setShowForm(false);
     setFormData({
       field_name: '',
+      field_label: '',
+      display_name: '',
       field_datatype_id: '',
       is_primary: false,
-      field_label: '',
       is_auto_increment: false,
       is_foreign_key: false,
       reference_table_id: '',
@@ -150,6 +154,7 @@ const TableField = ({ tableId, project }) => {
           <tr>
             <th>Name</th>
             <th>Label</th>
+            <th>Display</th>
             <th>Datatype</th>
             <th>Primary</th>
             <th>Auto-Inc</th>
@@ -168,6 +173,7 @@ const TableField = ({ tableId, project }) => {
               <tr key={field.table_wise_field_id}>
                 <td>{field.field_name}</td>
                 <td>{field.field_label}</td>
+                <td>{field.display_name}</td>
                 <td>{datatypes.find(dt => dt.field_datatype_id === field.field_datatype_id)?.datatype_name}</td>
                 <td>{field.is_primary ? 'Yes' : '-'}</td>
                 <td>{field.is_auto_increment ? 'Yes' : '-'}</td>
@@ -175,8 +181,8 @@ const TableField = ({ tableId, project }) => {
                 <td>{referenceTables.find(t => t.table_id === field.reference_table_id)?.table_name || ''}</td>
                 <td>{refField?.field_name || ''}</td>
                 <td>
-                  <Button size="sm" onClick={() => handleEdit(field)}>Edit</Button>{' '}
-                  <Button size="sm" variant="danger" onClick={() => handleDelete(field.table_wise_field_id)}>Delete</Button>
+                  <i class="fa-solid fa-pen-to-square fa-lg btn" onClick={() => handleEdit(field)}></i>
+                  <i class="fa-solid fa-trash fa-lg btn" onClick={() => handleDelete(field.table_wise_field_id)}></i>
                 </td>
               </tr>
             );
@@ -187,7 +193,6 @@ const TableField = ({ tableId, project }) => {
       <div className='d-flex justify-content-center container-fluid pb-5'>
         {showForm && (
           <Form onSubmit={handleSubmit} className="border p-3 rounded bg-white shadow">
-            {/* Row 1: Field Name, Label, Datatype */}
             <div className="row">
               <div className="col-md-4 mb-2">
                 <Form.Label>Field Name</Form.Label>
@@ -196,6 +201,10 @@ const TableField = ({ tableId, project }) => {
               <div className="col-md-4 mb-2">
                 <Form.Label>Field Label</Form.Label>
                 <Form.Control name="field_label" value={formData.field_label} onChange={handleChange} />
+              </div>
+              <div className="col-md-4 mb-2">
+                <Form.Label>Display Name</Form.Label>
+                <Form.Control name="display_name" value={formData.display_name} onChange={handleChange} />
               </div>
               <div className="col-md-4 mb-2">
                 <Form.Label>Field Datatype</Form.Label>
@@ -208,7 +217,6 @@ const TableField = ({ tableId, project }) => {
               </div>
             </div>
 
-            {/* Conditional Togglers */}
             {isNumericType() && (
               <>
                 <hr />
@@ -256,7 +264,6 @@ const TableField = ({ tableId, project }) => {
               </>
             )}
 
-            {/* Conditional Foreign Key Reference Selectors */}
             {formData.is_foreign_key && (
               <div className="row">
                 <hr />

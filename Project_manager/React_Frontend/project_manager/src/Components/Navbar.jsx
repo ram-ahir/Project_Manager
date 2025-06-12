@@ -1,11 +1,14 @@
 import React from 'react'
 
-const Navbar = () => {
+const Navbar = ({ currentProject }) => {
     return (
         <div>
             <nav className="navbar navbar-dark navbar-expand-lg bg-dark">
                 <div className="container-fluid">
-                    <a className="navbar-brand" href="#">Project Manager</a>
+                    <div className='d-flex gap-4'>
+                        <a className="navbar-brand" href="#">Project Manager</a>
+                        <h4 className='text-white m-0 pt-1'>{currentProject?.project_name || 'No project selected'}</h4>
+                    </div>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>

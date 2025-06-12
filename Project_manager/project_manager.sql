@@ -97,6 +97,7 @@ CREATE TABLE table_wise_field (
   field_datatype_id INTEGER NOT NULL,
   is_primary BOOLEAN DEFAULT false,
   field_label VARCHAR(255),
+  display_name VARCHAR(255),  -- 🆕 added field
   is_auto_increment BOOLEAN DEFAULT false,
   is_foreign_key BOOLEAN DEFAULT false,
   reference_table_id INTEGER,
@@ -117,20 +118,25 @@ CREATE TABLE table_wise_field (
 );
 
 
--- Fields for table_id = 5
-INSERT INTO table_wise_field (table_id, field_name, field_datatype_id, is_primary, field_label, is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id)
-VALUES
-(5, 'id', 1, true, 'ID', true, false, NULL, NULL),
-(5, 'name', 2, false, 'Name', false, false, NULL, NULL),
-(5, 'email', 2, false, 'Email', false, false, NULL, NULL),
-(5, 'user_type_id', 3, false, 'User Type', false, true, 9, NULL),
-(5, 'created_at', 4, false, 'Created At', false, false, NULL, NULL);
 
--- Fields for table_id = 9
-INSERT INTO table_wise_field (table_id, field_name, field_datatype_id, is_primary, field_label, is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id)
-VALUES
-(9, 'user_type_id', 1, true, 'User Type ID', true, false, NULL, NULL),
-(9, 'type_name', 2, false, 'Type Name', false, false, NULL, NULL),
-(9, 'is_active', 5, false, 'Is Active', false, false, NULL, NULL),
-(9, 'created_by', 3, false, 'Created By', false, true, 5, 1), -- references table 5, field 1 (id)
-(9, 'created_at', 4, false, 'Created At', false, false, NULL, NULL);
+-- Assume reference_table_field_id 11 refers to course_id in courses table
+INSERT INTO table_wise_field (
+  table_id, field_name, field_datatype_id, is_primary, field_label, display_name, 
+  is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id
+) VALUES 
+(6, 'student_id', 1, true, 'Student ID', 'Student ID', true, false, NULL, NULL),
+(6, 'student_name', 2, false, 'Name', 'Student Name', false, false, NULL, NULL),
+(6, 'email', 2, false, 'Email Address', 'Email', false, false, NULL, NULL),
+(6, 'dob', 4, false, 'Date of Birth', 'DOB', false, false, NULL, NULL),
+(6, 'course_id', 1, false, 'Course', 'Enrolled Course', false, true, NULL,NULL );
+
+
+INSERT INTO table_wise_field (
+  table_id, field_name, field_datatype_id, is_primary, field_label, display_name, 
+  is_auto_increment, is_foreign_key, reference_table_id, reference_table_field_id
+) VALUES 
+(7, 'course_id', 1, true, 'Course ID', 'Course ID', true, false, NULL, NULL),
+(7, 'course_name', 2, false, 'Course Name', 'Course Name', false, false, NULL, NULL),
+(7, 'course_description', 3, false, 'Description', 'Course Description', false, false, NULL, NULL),
+(7, 'credits', 1, false, 'Credits', 'Credit Hours', false, false, NULL, NULL),
+(7, 'created_on', 4, false, 'Created Date', 'Creation Date', false, false, NULL, NULL);
