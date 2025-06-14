@@ -69,25 +69,25 @@ VALUES
 
 CREATE TABLE field_datatype (
   field_datatype_id SERIAL PRIMARY KEY,
-  datatype_name VARCHAR(100) NOT NULL,
-  database_table_id INTEGER NOT NULL,
-  
-  CONSTRAINT fk_database_table
-    FOREIGN KEY (database_table_id)
-    REFERENCES database_table(database_id)
-    ON DELETE CASCADE
+  display_name VARCHAR(100) NOT NULL,
+  postgresql VARCHAR(100),
+  mysql VARCHAR(100),
+  mongodb VARCHAR(100)
 );
 
 
 
-INSERT INTO field_datatype (datatype_name, database_table_id) VALUES
-('Text',2),
-('NUMERIC (15, 2)',2),
-('boolean',2),
-('date',2),
-('time',2),
-('Image',2),
-('bytea	',2);
+INSERT INTO field_datatype (display_name, postgresql, mysql, mongodb) VALUES
+('Primary Key','bigserial PRIMARY KEY','BIGINT AUTO_INCREMENT PRIMARY KEY','ObjectId'),
+('Number','bigint','BIGINT','NumberLong'),
+('Decimal Number','NUMERIC (15, 4)','DECIMAL(15,4)','Decimal128'),
+('String','varchar(250)','VARCHAR(250)','String'),
+('Long Text','TEXT','TEXT','String'),
+('Boolean','boolean','BOOLEAN','Boolean'),
+('Date','date','DATE','Date'),
+('Time','time','TIME','String'), 
+('Bytea','bytea','BLOB','BinData');
+
 
 
 CREATE TABLE table_wise_field (

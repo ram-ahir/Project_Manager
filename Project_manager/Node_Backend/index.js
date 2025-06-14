@@ -292,7 +292,15 @@ app.delete('/api/fields/:id', async (req, res) => {
 app.get('/api/datatype', async (req, res) => {
   const { database_id } = req.query;
   if (!database_id) return res.status(400).json({ error: 'Missing database_id' });
-
+  try {
+    const result = await pool.query(
+      `SELECT * FROM field_datatype WHERE database_table_id = $1`,
+      [database_id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching datatypes:', err);
+  }
   try {
     const result = await pool.query(
       `SELECT * FROM field_datatype WHERE database_table_id = $1`,
@@ -314,8 +322,8 @@ app.get('/api/generate-sql', async (req, res) => {
   if (!table_id) return res.status(400).json({ error: 'Missing table_id' });
 
   try {
-    const tableRes = await pool.query(`SELECT * FROM all_table WHERE table_id = $1`,[table_id]);
-    const fieldsRes = await pool.query(`SELECT * FROM table_wise_field WHERE table_id = $1`,[table_id]);  
+    const tableRes = await pool.query(`SELECT * FROM all_table WHERE table_id = $1`, [table_id]);
+    const fieldsRes = await pool.query(`SELECT * FROM table_wise_field WHERE table_id = $1`, [table_id]);
 
     const table = tableRes.rows[0];
     const fields = fieldsRes.rows;

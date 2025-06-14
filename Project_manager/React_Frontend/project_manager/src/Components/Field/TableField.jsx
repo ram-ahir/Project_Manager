@@ -54,11 +54,13 @@ const TableField = ({ tableId, project }) => {
   const fetchFields = async () => {
     const res = await axios.get(`http://localhost:3000/api/fields?table_id=${tableId}`);
     setFields(res.data);
+    // console.log(res.data);
   };
 
   const fetchDatatypes = async () => {
     const res = await axios.get(`http://localhost:3000/api/datatype?database_id=${project.database_id}`);
     setDatatypes(res.data);
+    console.log(res.data)
   };
 
   const fetchReferenceTables = async () => {
