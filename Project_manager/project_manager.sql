@@ -5,6 +5,9 @@ CREATE TABLE database_table (
 );
 
 
+
+
+
 -- Table: project_table
 CREATE TABLE project_table (
     project_id SERIAL PRIMARY KEY,
