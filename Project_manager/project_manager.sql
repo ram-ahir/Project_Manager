@@ -80,7 +80,7 @@ CREATE TABLE field_datatype (
 
 
 
-INSERT INTO field_datatype (field_datatype_name, database_table_id) VALUES
+INSERT INTO field_datatype (datatype_name, database_table_id) VALUES
 ('Text',2),
 ('NUMERIC (15, 2)',2),
 ('boolean',2),

@@ -6,14 +6,18 @@ import Navbar from './Components/Navbar'
 // import AdminPanel from './Components/AdminPanel/AdminPanel'
 import Adminpanel from './Components/Adminpanel'
 
+import { ThemeProvider } from './Context/ThemeContext';
+
 function App() {
 
   const [currentProject, setcurrentProject] = useState(null);
 
   return (
     <>
-      <Navbar currentProject={currentProject}/>
-      <Adminpanel currentProject={currentProject} setcurrentProject={setcurrentProject}/>
+      <ThemeProvider>
+        <Navbar currentProject={currentProject} />
+        <Adminpanel currentProject={currentProject} setcurrentProject={setcurrentProject} />
+      </ThemeProvider>
     </>
   )
 }

@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Form, Button } from 'react-bootstrap';
+import { useTheme } from '../../Context/ThemeContext';
+
 
 const TableField = ({ tableId, project }) => {
+
+  const { gridHeaderStyle, selectedRowStyle } = useTheme();
+
   const [tablename, setTablename] = useState(" ")
   const [fields, setFields] = useState([]);
   const [editingFieldId, setEditingFieldId] = useState(null);
@@ -143,25 +148,25 @@ const TableField = ({ tableId, project }) => {
 
   return (
     <div className="mt-4">
-      <h5 className="mb-3">Fields for : {tablename.table_name}  </h5>
+      <h4 className="mb-0 text-center">Fields for : {tablename.table_name}  </h4>
 
-      <Button variant="primary" className="mb-3 float-end" onClick={() => { resetForm(); setShowForm(true); }}>
+      <Button  style={gridHeaderStyle} className="mb-3 float-end rounded-pill" onClick={() => { resetForm(); setShowForm(true); }}>
         Add Field
       </Button>
 
       <Table hover className='shadow'>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Label</th>
-            <th>Display</th>
-            <th>Datatype</th>
-            <th>Primary</th>
-            <th>Auto-Inc</th>
-            <th>Foreign Key</th>
-            <th>Reference Table</th>
-            <th>Reference Field</th>
-            <th>Actions</th>
+            <th style={gridHeaderStyle}>Field Name</th>
+            <th style={gridHeaderStyle}>Label</th>
+            <th style={gridHeaderStyle}>Display</th>
+            <th style={gridHeaderStyle}>Datatype</th>
+            <th style={gridHeaderStyle}>Primary</th>
+            <th style={gridHeaderStyle}>Auto-Inc</th>
+            <th style={gridHeaderStyle}>Foreign Key</th>
+            <th style={gridHeaderStyle}>Reference Table</th>
+            <th style={gridHeaderStyle}>Reference Field</th>
+            <th style={gridHeaderStyle}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -171,16 +176,16 @@ const TableField = ({ tableId, project }) => {
             );
             return (
               <tr key={field.table_wise_field_id}>
-                <td>{field.field_name}</td>
-                <td>{field.field_label}</td>
-                <td>{field.display_name}</td>
-                <td>{datatypes.find(dt => dt.field_datatype_id === field.field_datatype_id)?.datatype_name}</td>
-                <td>{field.is_primary ? 'Yes' : '-'}</td>
-                <td>{field.is_auto_increment ? 'Yes' : '-'}</td>
-                <td>{field.is_foreign_key ? 'Yes' : '-'}</td>
-                <td>{referenceTables.find(t => t.table_id === field.reference_table_id)?.table_name || ''}</td>
-                <td>{refField?.field_name || ''}</td>
-                <td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.field_name}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.field_label}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.display_name}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{datatypes.find(dt => dt.field_datatype_id === field.field_datatype_id)?.datatype_name}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.is_primary ? 'Yes' : '-'}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.is_auto_increment ? 'Yes' : '-'}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.is_foreign_key ? 'Yes' : '-'}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{referenceTables.find(t => t.table_id === field.reference_table_id)?.table_name || ''}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{refField?.field_name || ''}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>
                   <i class="fa-solid fa-pen-to-square fa-lg btn" onClick={() => handleEdit(field)}></i>
                   <i class="fa-solid fa-trash fa-lg btn" onClick={() => handleDelete(field.table_wise_field_id)}></i>
                 </td>

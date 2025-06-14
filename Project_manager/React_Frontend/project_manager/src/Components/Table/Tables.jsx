@@ -2,8 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Button, Form } from 'react-bootstrap';
 import TableField from '../Field/TableField';
+import { useTheme } from '../../Context/ThemeContext';
+
 
 const Tables = ({ project, onSelectTable }) => {
+
+  const { gridHeaderStyle, selectedRowStyle } = useTheme();
+
+
   const [tables, setTables] = useState([]);
   const [selectedTableId, setSelectedTableId] = useState(null);
   const [formData, setFormData] = useState({
@@ -14,6 +20,7 @@ const Tables = ({ project, onSelectTable }) => {
   });
   const [editing, setEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
 
   // Fetch tables when project changes
   useEffect(() => {
@@ -118,11 +125,24 @@ const Tables = ({ project, onSelectTable }) => {
     setShowForm(false);
   };
 
+  // handleGenerateSQL
+  const handleGenerateSQL = async (tableId) => {
+    try {
+      const res = await axios.get(`http://localhost:3000/api/generate-sql?table_id=${tableId}`);
+      console.log('Generated SQL:', res.data.query);
+      alert('SQL generated. Check console for output.');
+    } catch (err) {
+      console.error('Failed to generate SQL:', err);
+      alert('Failed to generate SQL.');
+    }
+  };
+
+
   return (
     <div className='px-2'>
-      <h5 className="mb-3 text-center">
-        Tables for Project: {project?.project_name || '—'}
-      </h5>
+      <h4 className=" text-center pt-3 mb-0">
+        Tables for : {project?.project_name || '—'}
+      </h4>
 
       <Button
         variant="primary"
@@ -131,6 +151,7 @@ const Tables = ({ project, onSelectTable }) => {
           resetForm();
           setShowForm(true);
         }}
+        style={gridHeaderStyle}
       >
         Add Table
       </Button>
@@ -138,30 +159,30 @@ const Tables = ({ project, onSelectTable }) => {
         <Table hover className='shadow rounded'>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Generated</th>
-              <th>Generated Date</th>
-              <th>Actions</th>
+              <th style={gridHeaderStyle}>Table Name</th>
+              <th style={gridHeaderStyle}>Table Description</th>
+              <th style={gridHeaderStyle}>Table is Generated</th>
+              <th style={gridHeaderStyle}>Generated Date</th>
+              <th style={gridHeaderStyle}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {tables.map(tbl => (
               <tr
                 key={tbl.table_id}
-                className={tbl.table_id === selectedTableId ? 'table-active' : ''}
+                // className={tbl.table_id === selectedTableId ? 'table-active' : ''}
                 onClick={() => handleRowClick(tbl)}
                 style={{ cursor: 'pointer' }}
               >
-                <td>{tbl.table_name}</td>
-                <td>{tbl.table_description}</td>
-                <td>{tbl.is_generated ? 'Yes' : 'No'}</td>
-                <td>
+                <td style={tbl.table_id === selectedTableId ? selectedRowStyle : {}}>{tbl.table_name}</td>
+                <td style={tbl.table_id === selectedTableId ? selectedRowStyle : {}}>{tbl.table_description}</td>
+                <td style={tbl.table_id === selectedTableId ? selectedRowStyle : {}}>{tbl.is_generated ? 'Yes' : 'No'}</td>
+                <td style={tbl.table_id === selectedTableId ? selectedRowStyle : {}}>
                   {tbl.generated_date
                     ? new Date(tbl.generated_date).toLocaleString()
                     : '-'}
                 </td>
-                <td className="">
+                <td className="" style={tbl.table_id === selectedTableId ? selectedRowStyle : {}}>
                   <i class="fa-solid fa-pen-to-square fa-lg btn"
                     onClick={(e) => {
                       e.stopPropagation(); // prevent row click
@@ -175,6 +196,19 @@ const Tables = ({ project, onSelectTable }) => {
                       handleDelete(tbl.table_id);
                     }}
                   ></i>
+                  <Button
+                    variant="outline-success"
+                    size="sm"
+                    className="rounded-4"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleGenerateSQL(tbl.table_id);
+                    }}
+                  >
+                    Generate
+                  </Button>
+
+
                 </td>
               </tr>
             ))}

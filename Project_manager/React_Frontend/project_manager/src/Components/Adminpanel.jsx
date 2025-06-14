@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Adminpanelstyle.css'; // Import styles for sidebar and active/hover effect
 import Project from './Project/Project';
 import Tables from './Table/Tables';
+import ThemeSettings from './Theme/ThemeSettings';
 
 const Adminpanel = ({currentProject, setcurrentProject}) => {
 
@@ -13,7 +14,7 @@ const Adminpanel = ({currentProject, setcurrentProject}) => {
     switch (activeItem) {
       case 'Project':
         return (
-            <Project setcurrentProject={setcurrentProject}/>
+            <Project currentProject={currentProject} setcurrentProject={setcurrentProject}/>
         )
       case 'Tables':
         return (
@@ -21,12 +22,18 @@ const Adminpanel = ({currentProject, setcurrentProject}) => {
         )
       case 'Forms':
         return <div><h3>Forms Section</h3><p>Manage forms here.</p></div>;
+
+      case 'Theme':
+        return (
+            <ThemeSettings/>
+        )
+      
       default:
         return <div><h3>Welcome</h3><p>Select a section from the sidebar.</p></div>;
     }
   };
 
-  const navItems = ['Project', 'Tables', 'Forms'];
+  const navItems = ['Project', 'Tables', 'Forms', 'Theme'];
 
   return (
     <div className="admin-panel-container">

@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Button, Form } from 'react-bootstrap';
-import { GridHeaderstyles,SelectedGridStyle } from '../../Style/GridStyle';
+import { useTheme } from '../../Context/ThemeContext';
 
 
-const Project = ({ setcurrentProject }) => {
+
+const Project = ({ currentProject, setcurrentProject }) => {
+
+    const { gridHeaderStyle, selectedRowStyle } = useTheme();
+
+
     const [projects, setProjects] = useState([]);
     const [databases, setDatabases] = useState([]);
     const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -23,6 +28,13 @@ const Project = ({ setcurrentProject }) => {
         fetchProjects();
         fetchDatabases();
     }, []);
+
+    useEffect(() => {
+        if (currentProject && currentProject.project_id) {
+            setSelectedProjectId(currentProject.project_id);
+            setSelectedProjectName(currentProject.project_name);
+        }
+    }, [currentProject, projects]);
 
     const fetchProjects = async () => {
         try {
@@ -115,7 +127,7 @@ const Project = ({ setcurrentProject }) => {
             <h5 className="mb-3 text-center pt-2">Project : {selectedProjectName}</h5>
 
             <Button
-                variant="primary"
+                style={gridHeaderStyle}
                 className="mb-3 float-end rounded-pill"
                 onClick={() => {
                     resetForm();
@@ -128,12 +140,12 @@ const Project = ({ setcurrentProject }) => {
                 <Table hover className="shadow rounded">
                     <thead>
                         <tr>
-                            <th style={GridHeaderstyles}>Name</th>
-                            <th style={GridHeaderstyles}>Description</th>
-                            <th style={GridHeaderstyles}>Database</th>
-                            <th style={GridHeaderstyles}>Database Path</th>
-                            <th style={GridHeaderstyles}>Project Path</th>
-                            <th style={GridHeaderstyles}>Actions</th>
+                            <th style={gridHeaderStyle}>Name</th>
+                            <th style={gridHeaderStyle}>Description</th>
+                            <th style={gridHeaderStyle}>Database</th>
+                            <th style={gridHeaderStyle}>Database Path</th>
+                            <th style={gridHeaderStyle}>Project Path</th>
+                            <th style={gridHeaderStyle}>Actions</th>
                         </tr>
                     </thead>
 
@@ -141,20 +153,32 @@ const Project = ({ setcurrentProject }) => {
                         {projects.map(proj => (
                             <tr
                                 key={proj.project_id}
-                                className={proj.project_id === selectedProjectId ? 'table-active' : ''}
+                                // className={proj.project_id === selectedProjectId ? 'table-active' : ''}
                                 onClick={() => {
                                     setSelectedProjectId(proj.project_id);
                                     setcurrentProject(proj);
                                     setSelectedProjectName(proj.project_name)
                                 }}
-                                style={{ cursor: 'pointer'}}
+                                style={{
+                                    cursor: 'pointer'
+                                }}
                             >
-                                <td>{proj.project_name}</td>
-                                <td>{proj.project_description}</td>
-                                <td>{getDatabaseName(proj.database_id)}</td>
-                                <td>{proj.database_path}</td>
-                                <td>{proj.project_path}</td>
-                                <td className="">
+                                <td style={proj.project_id === selectedProjectId ? selectedRowStyle : {}}>
+                                    {proj.project_name}
+                                </td>
+                                <td style={proj.project_id === selectedProjectId ? selectedRowStyle : {}}>
+                                    {proj.project_description}
+                                </td>
+                                <td style={proj.project_id === selectedProjectId ? selectedRowStyle : {}}>
+                                    {getDatabaseName(proj.database_id)}
+                                </td>
+                                <td style={proj.project_id === selectedProjectId ? selectedRowStyle : {}}>
+                                    {proj.database_path}
+                                </td>
+                                <td style={proj.project_id === selectedProjectId ? selectedRowStyle : {}}>
+                                    {proj.project_path}
+                                </td>
+                                <td style={proj.project_id === selectedProjectId ? selectedRowStyle : {}}>
                                     <i class="fa-solid fa-pen-to-square fa-lg btn" onClick={(e) => { e.stopPropagation(); handleEdit(proj); }}></i>
                                     <i class="fa-solid fa-trash fa-lg btn" onClick={(e) => { e.stopPropagation(); handleDelete(proj.project_id); }}></i>
                                 </td>

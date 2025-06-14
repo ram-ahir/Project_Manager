@@ -43,7 +43,7 @@ app.post('/api/project', async (req, res) => {
   const result = await pool.query(
     `INSERT INTO project_table (project_name, project_description, database_id, database_path, project_path)
      VALUES ($1, $2,$3 ,$4, $5) RETURNING *`,
-    [project_name, project_description, database_id, database_path, project_path ]
+    [project_name, project_description, database_id, database_path, project_path]
   );
   res.status(201).json(result.rows[0]);
 });
@@ -304,6 +304,52 @@ app.get('/api/datatype', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+
+//############################################################################################# 
+app.get('/api/generate-sql', async (req, res) => {
+  const { table_id } = req.query;
+  const xtable_id = toString(table_id);
+  if (!table_id) return res.status(400).json({ error: 'Missing table_id' });
+
+  try {
+    const tableRes = await pool.query(`SELECT * FROM all_table WHERE table_id = $1`,[table_id]);
+    const fieldsRes = await pool.query(`SELECT * FROM table_wise_field WHERE table_id = $1`,[table_id]);  
+
+    const table = tableRes.rows[0];
+    const fields = fieldsRes.rows;
+
+    let sql = `CREATE TABLE ${table.table_name} (\n`;
+
+    // Resolve all datatype names first
+    const columnLines = await Promise.all(fields.map(async (f) => {
+      const datatype = await getSQLType(f.field_datatype_id);
+
+      let line = `  ${f.field_name} ${datatype}`;
+      if (f.is_auto_increment) line += ' SERIAL';
+      if (f.is_primary) line += ' PRIMARY KEY';
+      return line;
+    }));
+
+    sql += columnLines.join(',\n') + '\n);';
+
+    res.json({ query: sql });
+  } catch (err) {
+    console.error('Error generating SQL:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Make sure getSQLType is async
+const getSQLType = async (datatypeId) => {
+  const result = await pool.query(
+    `SELECT datatype_name FROM field_datatype WHERE field_datatype_id = $1`,
+    [datatypeId]
+  );
+
+  return result.rows[0]?.datatype_name || 'TEXT';
+};
 
 
 
