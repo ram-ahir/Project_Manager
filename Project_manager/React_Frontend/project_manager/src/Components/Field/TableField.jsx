@@ -29,8 +29,9 @@ const TableField = ({ tableId, project }) => {
 
   const isNumericType = () => {
     const selected = datatypes.find(dt => dt.field_datatype_id === parseInt(formData.field_datatype_id));
-    return selected && selected.datatype_name.includes("NUMERIC (15, 2)");
+    return selected && ['Number', 'Decimal Number', 'Primary Key'].includes(selected.display_name);
   };
+
 
   useEffect(() => {
     if (!tableId || !project?.project_id) return;
@@ -58,7 +59,7 @@ const TableField = ({ tableId, project }) => {
   };
 
   const fetchDatatypes = async () => {
-    const res = await axios.get(`http://localhost:3000/api/datatype?database_id=${project.database_id}`);
+    const res = await axios.get(`http://localhost:3000/api/datatype`);
     setDatatypes(res.data);
     console.log(res.data)
   };
@@ -152,7 +153,7 @@ const TableField = ({ tableId, project }) => {
     <div className="mt-4">
       <h4 className="mb-0 text-center">Fields for : {tablename.table_name}  </h4>
 
-      <Button  style={gridHeaderStyle} className="mb-3 float-end rounded-pill" onClick={() => { resetForm(); setShowForm(true); }}>
+      <Button style={gridHeaderStyle} className="mb-3 float-end rounded-pill" onClick={() => { resetForm(); setShowForm(true); }}>
         Add Field
       </Button>
 
@@ -181,7 +182,9 @@ const TableField = ({ tableId, project }) => {
                 <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.field_name}</td>
                 <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.field_label}</td>
                 <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.display_name}</td>
-                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{datatypes.find(dt => dt.field_datatype_id === field.field_datatype_id)?.datatype_name}</td>
+                <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>
+                  {datatypes.find(dt => dt.field_datatype_id === field.field_datatype_id)?.display_name}
+                </td>
                 <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.is_primary ? 'Yes' : '-'}</td>
                 <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.is_auto_increment ? 'Yes' : '-'}</td>
                 <td style={field.table_wise_field_id === editingFieldId ? selectedRowStyle : {}}>{field.is_foreign_key ? 'Yes' : '-'}</td>
@@ -218,8 +221,11 @@ const TableField = ({ tableId, project }) => {
                 <Form.Select name="field_datatype_id" value={formData.field_datatype_id} onChange={handleChange} required>
                   <option value="">Select datatype</option>
                   {datatypes.map(dt => (
-                    <option key={dt.field_datatype_id} value={dt.field_datatype_id}>{dt.datatype_name}</option>
+                    <option key={dt.field_datatype_id} value={dt.field_datatype_id}>
+                      {dt.display_name}
+                    </option>
                   ))}
+
                 </Form.Select>
               </div>
             </div>

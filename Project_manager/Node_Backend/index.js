@@ -288,30 +288,18 @@ app.delete('/api/fields/:id', async (req, res) => {
   }
 });
 
-// datatype by database id
+
+// GET all field datatypes 
 app.get('/api/datatype', async (req, res) => {
-  const { database_id } = req.query;
-  if (!database_id) return res.status(400).json({ error: 'Missing database_id' });
   try {
-    const result = await pool.query(
-      `SELECT * FROM field_datatype WHERE database_table_id = $1`,
-      [database_id]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching datatypes:', err);
-  }
-  try {
-    const result = await pool.query(
-      `SELECT * FROM field_datatype WHERE database_table_id = $1`,
-      [database_id]
-    );
+    const result = await pool.query(`SELECT * FROM field_datatype ORDER BY field_datatype_id`);
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching datatypes:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
@@ -352,12 +340,12 @@ app.get('/api/generate-sql', async (req, res) => {
 // Make sure getSQLType is async
 const getSQLType = async (datatypeId) => {
   const result = await pool.query(
-    `SELECT datatype_name FROM field_datatype WHERE field_datatype_id = $1`,
+    `SELECT postgresql FROM field_datatype WHERE field_datatype_id = $1`,
     [datatypeId]
   );
-
-  return result.rows[0]?.datatype_name || 'TEXT';
+  return result.rows[0]?.postgresql || 'TEXT';
 };
+
 
 
 

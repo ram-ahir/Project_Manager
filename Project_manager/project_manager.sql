@@ -79,9 +79,7 @@ CREATE TABLE field_datatype (
 );
 
 
-
 INSERT INTO field_datatype (display_name, postgresql, mysql, mongodb) VALUES
-('Primary Key','bigserial PRIMARY KEY','BIGINT AUTO_INCREMENT PRIMARY KEY','ObjectId'),
 ('Number','bigint','BIGINT','NumberLong'),
 ('Decimal Number','NUMERIC (15, 4)','DECIMAL(15,4)','Decimal128'),
 ('String','varchar(250)','VARCHAR(250)','String'),
