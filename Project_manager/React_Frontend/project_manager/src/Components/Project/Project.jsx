@@ -24,9 +24,15 @@ const Project = ({ currentProject, setcurrentProject }) => {
     const [editing, setEditing] = useState(false);
     const [showForm, setShowForm] = useState(false);
 
-    useEffect(() => {
+    useEffect( () => {
         fetchProjects();
         fetchDatabases();
+        // try {
+        //     const res = await axios.get('http://127.0.0.1:8000/');
+        //     console.log(res.data);
+        // } catch (err) {
+        //     console.error('Failed to fetch projects:', err);
+        // }
     }, []);
 
     useEffect(() => {

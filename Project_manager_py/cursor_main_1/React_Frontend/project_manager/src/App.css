@@ -1,0 +1,55 @@
+/* Global layout styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* App container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Ensure proper z-index layering */
+.MuiDrawer-root {
+  z-index: 1100;
+}
+
+.MuiAppBar-root {
+  z-index: 1200;
+}
+
+/* Prevent content overflow */
+.MuiBox-root {
+  box-sizing: border-box;
+}
+
+/* Ensure navbar stays on top */
+.MuiAppBar-root {
+  position: sticky !important;
+  top: 0;
+}
+
+/* Ensure drawer doesn't overlap navbar */
+.MuiDrawer-paper {
+  top: 64px !important;
+}
+
+/* Smooth transitions */
+.MuiDrawer-root,
+.MuiBox-root {
+  transition: all 0.3s ease;
+}
